@@ -36,9 +36,9 @@ struct Node { //for ast
     Node* mother_node; //might be usefull, no idea tho
 };
 
-const char* tokenTypeToString(token_type t)
+const char* tokenTypeToString(token_type type)
 {
-    switch (t) {
+    switch (type) {
         case TOKEN_NUMBER: return "number";
         case TOKEN_PLUS:    return "+";
         case TOKEN_MINUS:   return "-";
@@ -51,7 +51,7 @@ const char* tokenTypeToString(token_type t)
         case TOKEN_LPAREN:  return "(";
         case TOKEN_RPAREN:  return ")";
         default:            return "UNKNOWN";
-    }
+    
 }
 
 token_type readFunction(int* i, char* Input) { //in case tan is not just t a and n
@@ -70,7 +70,7 @@ token_type readFunction(int* i, char* Input) { //in case tan is not just t a and
     else {
         printf("Something fucked up\n");
         return TOKEN_DEFAULT;
-    } 
+    }
 }
 
 int readFullNumber(int* i, char* Input) { //in case 56 is not just 5 and 6 

@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define RETURN_VALUE 0
 #define DEFAULT 67 
 
-//How should I go on about this?
+//How should I go on about this? This file might mainly be the program to turn input string into ast?
 /* Goals:
 1. Way to parse text into tokens, creates a list which can be given to another function that
    creates the ast. Preferably would love for it to be reusable
@@ -29,7 +30,25 @@ typedef enum { //Pretty self explanatory.
     TOKEN_TAN
 } token_type; 
 
-typedef struct token {
+const char* tokenTypeToString(token_type type)
+{
+    switch (type) {
+        case TOKEN_NUMBER: return "number";
+        case TOKEN_PLUS:    return "+";
+        case TOKEN_MINUS:   return "-";
+        case TOKEN_MULTIPLY: return "*";
+        case TOKEN_DIVIDE:  return "/";
+        case TOKEN_VARIABLE: return "variable";
+        case TOKEN_COS:     return "cos";
+        case TOKEN_SIN:     return "sin";
+        case TOKEN_TAN:     return "tan";
+        case TOKEN_LPAREN:  return "(";
+        case TOKEN_RPAREN:  return ")";
+        default:            return "UNKNOWN";
+    }
+}
+
+typedef struct {
     token_type type;
     struct { //Used only for number and variable types.
         int number;
@@ -38,12 +57,12 @@ typedef struct token {
 } token;
 
 typedef struct { //Dynamic array for tokens.
-    token *data;
-    int size;
-    int capacity;
+    token *data; //List containing tokens.
+    int size; //Amount of tokens.
+    int capacity; //Maximum amount of tokens currently.
 } tokensArray;
 
-token* createToken(token_type type, int number, char variable) { //Allocates memory for a new token.
+token *createToken(token_type type, int number, char variable) { //Allocates memory for a new token.
     token* result = malloc(sizeof(token));
     if (result != NULL) {
         result->type = type;
@@ -67,12 +86,67 @@ void addTokenToArray (tokensArray *tokens, token *newToken) { //Adding new token
         printf("Allocating more memory for tokens...\n");
         tokens->capacity *= 2;
         tokens->data = realloc(tokens->data, tokens->capacity * sizeof(token)); 
+        if (tokens->data == NULL) {
+            printf("Memory allocation failed!\n");
+            return;
+        } 
     }
     tokens->data[tokens->size] = *newToken;
     tokens->size++;
 }
 
-token* tokenizer (char* input) { //Parsing text into a dynamic array of tokens.
+token_type readFullFunction(char* input, int* i) {
+    char function[20]; //Defines max function length too.
+    int a = 0;
+    while(input[(*i)] >= 'a' && input[(*i)] <= 'z') {
+        function[a] = input[*i];
+        (*i)++;
+        a++;
+    }
+    function[a] = '\0';  
+
+    printf("Succesfully read function: %s \n", function); //Debugging
+    if (strcmp(function, "sin") == 0) {return TOKEN_SIN;}  //Need to add more funcitons eventually.
+    if (strcmp(function, "cos") == 0) {return TOKEN_COS;}
+    if (strcmp(function, "tan") == 0) {return TOKEN_TAN;}
+    else {
+        printf("Something fucked up\n");
+        return TOKEN_DEFAULT;
+    }
+}
+
+int readFullNumber(char* input, int* i) { //Probably easier way to do this with libaries.
+    int number = input[*i] - '0';
+    while (input[(*i)+1] >= '0' && input[(*i)+1] <= '9') {
+        number = number*10 + (input[(*i)+1] - '0');
+        (*i)++;
+    }
+    (*i)++;
+    printf("Succesfully read number %d\n", number); //Debugging
+    return number;
+}
+
+void tokenizer (tokensArray* tokens, char* input) { //Parsing text into a dynamic array of tokens.
+    int i = 0;
+    while (input[i] != '\0') { //Loops throught input.
+        char c = input[i];
+        if (c >= '0' && c <= '9') { //Number
+            addTokenToArray(tokens, createToken(TOKEN_NUMBER, readFullNumber(input, &i), DEFAULT));
+        }
+        if (c >= 'a' && c <= 'z') { //Letter
+            if (input[i+1] >= 'a' && input[i+1] <= 'z') { //Next also letter meaning function
+                addTokenToArray(tokens, createToken(readFullFunction(input, &i), DEFAULT, DEFAULT));
+            }
+            else { //Just a variable
+                addTokenToArray(tokens, createToken(TOKEN_VARIABLE, DEFAULT, c));
+                i++;
+                continue;
+            }
+        }
+        if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '^') { //special charathers
+
+        }
+    }
 
 }
 
@@ -81,13 +155,20 @@ int main (int *argc, char argv[]) {
     initTokenArray(&tokens);
 
     //debugging
+/*
     addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
     addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
     addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
     addTokenToArray(&tokens, createToken(TOKEN_NUMBER, 2, DEFAULT));
-    printf("%d\n", tokens.data[3].value.number);
-    printf("%d\n", tokens.size);
-    
+
+    for(int j = 0; j<=100; j++) {
+        addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
+    }
+
+    for(int i = 0; i<tokens.size; i++) {
+        printf("%d. token type: %s\n", i+1, tokenTypeToString(tokens.data[i].type));
+    }
+*/
     return RETURN_VALUE;
 }
 
