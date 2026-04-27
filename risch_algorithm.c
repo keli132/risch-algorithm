@@ -67,9 +67,7 @@ void addTokenToArray (tokensArray *tokens, token *newToken) { //Adding new token
         printf("Allocating more memory for tokens...\n");
         tokens->capacity *= 2;
         tokens->data = realloc(tokens->data, tokens->capacity * sizeof(token)); 
-        printf("woof\n");
     }
-    printf("meow\n");
     tokens->data[tokens->size] = *newToken;
     tokens->size++;
 }
