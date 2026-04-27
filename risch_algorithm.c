@@ -155,7 +155,7 @@ void tokenize (tokensArray* tokens, char* input) { //Parsing text into a dynamic
             case '(': addTokenToArray(tokens, createToken(TOKEN_LPAREN, DEFAULT, DEFAULT)); break;
             case ')': addTokenToArray(tokens, createToken(TOKEN_RPAREN, DEFAULT, DEFAULT)); break;
         }
-        printf("Succesfully tokenized input: %c\n", c);
+        printf("Succesfully read input: %c\n", c);
         i++;
         continue;
     }
