@@ -268,7 +268,7 @@ void createAst(tokensArray *tokens) {
         }
     }
 }
-
+  
 int main (int *argc, char argv[]) {
     tokensArray tokens; //Initializing 
     initTokenArray(&tokens);
