@@ -30,7 +30,7 @@ typedef enum { //Pretty self explanatory.
     TOKEN_TAN
 } token_type; 
 
-const char* tokenTypeToString(token_type type)
+const char* tokenTypeToString(int type)
 {
     switch (type) {
         case TOKEN_NUMBER: return "number";
@@ -126,28 +126,40 @@ int readFullNumber(char* input, int* i) { //Probably easier way to do this with 
     return number;
 }
 
-void tokenizer (tokensArray* tokens, char* input) { //Parsing text into a dynamic array of tokens.
+void tokenize (tokensArray* tokens, char* input) { //Parsing text into a dynamic array of tokens.
     int i = 0;
+    char c;
     while (input[i] != '\0') { //Loops throught input.
-        char c = input[i];
+        c = input[i];
         if (c >= '0' && c <= '9') { //Number
             addTokenToArray(tokens, createToken(TOKEN_NUMBER, readFullNumber(input, &i), DEFAULT));
+            continue;
         }
         if (c >= 'a' && c <= 'z') { //Letter
             if (input[i+1] >= 'a' && input[i+1] <= 'z') { //Next also letter meaning function
                 addTokenToArray(tokens, createToken(readFullFunction(input, &i), DEFAULT, DEFAULT));
+                continue;
             }
             else { //Just a variable
                 addTokenToArray(tokens, createToken(TOKEN_VARIABLE, DEFAULT, c));
+                printf("Succesfully read variable: %c\n", c); //Debugging
                 i++;
                 continue;
             }
+        } 
+        switch(c) {
+            case '+': addTokenToArray(tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT)); break;
+            case '-': addTokenToArray(tokens, createToken(TOKEN_MINUS, DEFAULT, DEFAULT)); break;
+            case '/': addTokenToArray(tokens, createToken(TOKEN_DIVIDE, DEFAULT, DEFAULT)); break;
+            case '*': addTokenToArray(tokens, createToken(TOKEN_MULTIPLY, DEFAULT, DEFAULT)); break;
+            case '(': addTokenToArray(tokens, createToken(TOKEN_LPAREN, DEFAULT, DEFAULT)); break;
+            case ')': addTokenToArray(tokens, createToken(TOKEN_RPAREN, DEFAULT, DEFAULT)); break;
         }
-        if (c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '^') { //special charathers
-
-        }
+        printf("Succesfully tokenized input: %c\n", c);
+        i++;
+        continue;
     }
-
+    printf("Succesfully tokenized input string!\n"); //Debugging
 }
 
 int main (int *argc, char argv[]) {
@@ -155,20 +167,13 @@ int main (int *argc, char argv[]) {
     initTokenArray(&tokens);
 
     //debugging
-/*
-    addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
-    addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
-    addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
-    addTokenToArray(&tokens, createToken(TOKEN_NUMBER, 2, DEFAULT));
-
-    for(int j = 0; j<=100; j++) {
-        addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
-    }
+    char text[] = "23x1111)(sin/sin))(tan))(/(y4";
+    tokenize(&tokens, text);
 
     for(int i = 0; i<tokens.size; i++) {
         printf("%d. token type: %s\n", i+1, tokenTypeToString(tokens.data[i].type));
     }
-*/
+
     return RETURN_VALUE;
 }
 
