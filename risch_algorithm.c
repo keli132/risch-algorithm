@@ -41,6 +41,17 @@ typedef struct { //Dynamic array for tokens.
     int capacity;
 } tokensArray;
 
+token *createToken(token_type type, int number, char variable) { //Allocates memory for a new token.
+    token* result = malloc(sizeof(token));
+    if (result != NULL) {
+        result->type = type;
+        result->value.number = number;
+        result->value.variable = variable;
+        return result;
+    }
+    printf("Something went wrong with memory allocation!\n");
+}
+
 void initTokenArray (tokensArray *tokens) { //initializing dynamic array.
     tokens->size = 0;
     tokens->capacity = 2; 
@@ -60,6 +71,10 @@ token* tokenizer (char* input) { //Parsing text into a dynamic array of tokens.
 }
 
 int main (int *argc, char argv[]) {
+    //debugging
+    tokensArray tokens;
+    initTokenArray(&tokens);
+    pushTokenToArray(&tokens, *createToken(TOKEN_NUMBER, 2, NULL));
 
     return RETURN_VALUE;
 }
