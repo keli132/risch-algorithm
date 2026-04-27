@@ -167,11 +167,23 @@ int main (int *argc, char argv[]) {
     initTokenArray(&tokens);
 
     //debugging
-    char text[] = "23x1111)(sin/sin))(tan))(/(y4";
+    char text[] = "21/(x+42)*(x-1*tan(x))";
     tokenize(&tokens, text);
 
-    for(int i = 0; i<tokens.size; i++) {
+    for (int i = 0; i<tokens.size; i++) {
         printf("%d. token type: %s\n", i+1, tokenTypeToString(tokens.data[i].type));
+    }
+    printf("Original input: ");
+    for (int i = 0; i<tokens.size; i++) {
+        if (tokens.data[i].type == TOKEN_NUMBER) {
+            printf("%d", tokens.data[i].value.number);
+            continue;
+        }
+        if (tokens.data[i].type == TOKEN_VARIABLE) {
+            printf("%c", tokens.data[i].value.variable);
+            continue;
+        }
+        printf("%s", tokenTypeToString(tokens.data[i].type));
     }
 
     return RETURN_VALUE;
