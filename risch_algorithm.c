@@ -132,7 +132,7 @@ void removeTokenFromArray (tokensArray *tokens, int removeTokenPosition) { //Rem
     }
 }
 
-void createAst (tokensArray *tokens);
+node *createAst (tokensArray *tokens);
 void debugPrint (tokensArray  *tokens);
 void findMostOutParen(tokensArray *tokens);
 
@@ -144,8 +144,9 @@ node *createSubTree (tokensArray *tokens, int firstTokenPosition, int lastTokenP
         addTokenToArray(&subTokens, &(tokens->data[i]));
     }
     debugPrint(&subTokens);
+    findMostOutParen(&subTokens);
+    return createAst(&subTokens);
 
-    
 }
 
 void debugPrint (tokensArray *tokens) {
@@ -296,6 +297,7 @@ operations.
 Once we have the addresses for the outermost parenthesis we should try to create a subtree?
 */
 
+
 void findMostOutParen (tokensArray *tokens) {
     int leftParen_count = 0; 
     int rightParen_count = 0;
@@ -321,12 +323,12 @@ void findMostOutParen (tokensArray *tokens) {
         }
     }
 
+    //Then actual ast creation logic.
+
 }
 
-
-void createAst(tokensArray *tokens) {
-    findMostOutParen(tokens);
-
+node *createAst(tokensArray *tokens) {
+    
 
 
 }
@@ -337,12 +339,12 @@ int main (int *argc, char argv[]) {
     initTokenArray(&tokens, 2);
 
     //debugging
-    char text[] = "x*(1+(x+1)*4)+(33/2)+x*(67*x+2)";
+    char text[] = "x*(x+1)+2";
     tokenize(&tokens, text);
 
     debugPrint(&tokens);
-
-    createAst(&tokens);
+    findMostOutParen(&tokens);
+    
 
     return RETURN_VALUE;
 }
