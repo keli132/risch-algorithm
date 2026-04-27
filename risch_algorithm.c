@@ -95,7 +95,10 @@ node *createNode (token* referenceToken, node* leftNode, node* rightNode, node* 
         return result;
     }
     printf("Something went wrong with memory allocation!\n");
-
+}
+node *createSubTree (tokensArray *tokens, int firstTokenPosition, int lastTokenPosition) {
+    node* result = malloc(sizeof(node));
+    
 }
 
 void initTokenArray (tokensArray *tokens) { //Initializing dynamic array.
@@ -243,7 +246,8 @@ inside one as a placeholder node before it starts to recursively call itself on 
 After it correctly finds and makes the outside parenthesis placeholder nodes it can start to look into order of
 operations.
 
-(()) ()
+
+Once we have the addresses for the outermost 
 */
 
 void createAst(tokensArray *tokens) {
@@ -252,8 +256,8 @@ void createAst(tokensArray *tokens) {
     token* leftParen = NULL;
     token* rightParen;
 
-    for(int i = 0; i < tokens->size; i++) { //loops thought tokens.
-        if (tokens->data[i].type == TOKEN_LPAREN) { //First encounter will be outmost paren
+    for(int i = 0; i < tokens->size; i++) { //loops throught tokens.
+        if (tokens->data[i].type == TOKEN_LPAREN) { //First encounter will be outmost parenthesis.
             leftParen_count++;
             if (leftParen == NULL) {
                 leftParen = &tokens->data[i];
@@ -264,17 +268,21 @@ void createAst(tokensArray *tokens) {
             rightParen = &tokens->data[i];
         }
         if (leftParen_count == rightParen_count && leftParen_count != 0) {
-            printf("Outmost parenthesis found in: %d and %d\n", );
+            printf("Outmost parenthesis from %d to %d\n", leftParen->position, rightParen->position); //Debug
+            leftParen_count = rightParen_count = 0; //Resets the counter.
+            leftParen = NULL;     
         }
     }
+
+    
 }
-  
+
 int main (int *argc, char argv[]) {
     tokensArray tokens; //Initializing 
     initTokenArray(&tokens);
 
     //debugging
-    char text[] = "x*(x+1)";
+    char text[] = "x*(1+(x+1)*4)+(33)+x*()";
     tokenize(&tokens, text);
 
     for (int i = 0; i<tokens.size; i++) {
@@ -292,6 +300,8 @@ int main (int *argc, char argv[]) {
         }
         printf("%s", tokenTypeToString(tokens.data[i].type));
     }
+    printf("\n");
+    createAst(&tokens);
 
     return RETURN_VALUE;
 }
