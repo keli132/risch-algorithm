@@ -13,6 +13,7 @@
 3. way to use the ast in a meaningfull way i.e. a way to go from node to node and simplify
    expressions.
 
+   Also I will be very strict with the input rules so no need to think how to make it easier since it's carved in stone now.
 */
 
 typedef enum { //Pretty self explanatory.
@@ -30,7 +31,7 @@ typedef enum { //Pretty self explanatory.
     TOKEN_TAN
 } token_type; 
 
-const char* tokenTypeToString(int type)
+const char* tokenTypeToString(int type) //For the ease of debugging.
 {
     switch (type) {
         case TOKEN_NUMBER: return "number";
@@ -54,6 +55,7 @@ typedef struct {
         int number;
         char variable;
     } value;
+    int position; //Position in tokensArray.
 } token;
 
 typedef struct { //Dynamic array for tokens.
@@ -61,6 +63,14 @@ typedef struct { //Dynamic array for tokens.
     int size; //Amount of tokens.
     int capacity; //Maximum amount of tokens currently.
 } tokensArray;
+
+typedef struct node{
+    token* referenceToken; //Reference to the token where information about object is. Should be faster than
+                           //just copying the values to the node.
+    struct node* leftNode; //Pointers to childs give stucture to the ast.
+    struct node* rightNode;
+    struct node* motherNode;
+} node;
 
 token *createToken(token_type type, int number, char variable) { //Allocates memory for a new token.
     token* result = malloc(sizeof(token));
@@ -75,6 +85,19 @@ token *createToken(token_type type, int number, char variable) { //Allocates mem
     printf("Something went wrong with memory allocation!\n");
 }
 
+node *createNode (token* referenceToken, node* leftNode, node* rightNode, node* motherNode) { //Allocates memory for a new node.
+    node* result = malloc(sizeof(node));
+    if (result != NULL) {
+        result->referenceToken = referenceToken;
+        result->leftNode = leftNode;
+        result->rightNode = rightNode;
+        result->motherNode = motherNode;
+        return result;
+    }
+    printf("Something went wrong with memory allocation!\n");
+
+}
+
 void initTokenArray (tokensArray *tokens) { //Initializing dynamic array.
     tokens->size = 0;
     tokens->capacity = 2; 
@@ -82,7 +105,7 @@ void initTokenArray (tokensArray *tokens) { //Initializing dynamic array.
 }
 
 void addTokenToArray (tokensArray *tokens, token *newToken) { //Adding new token to array.
-    if (tokens->size == tokens->capacity) { //Add capacity if full.
+    if (tokens->size == tokens->capacity) { //Adds capacity if full.
         printf("Allocating more memory for tokens...\n");
         tokens->capacity *= 2;
         tokens->data = realloc(tokens->data, tokens->capacity * sizeof(token)); 
@@ -91,6 +114,7 @@ void addTokenToArray (tokensArray *tokens, token *newToken) { //Adding new token
             return;
         } 
     }
+    newToken->position = tokens->size;
     tokens->data[tokens->size] = *newToken;
     tokens->size++;
 }
@@ -110,7 +134,7 @@ token_type readFullFunction(char* input, int* i) {
     if (strcmp(function, "cos") == 0) {return TOKEN_COS;}
     if (strcmp(function, "tan") == 0) {return TOKEN_TAN;}
     else {
-        printf("Something fucked up\n");
+        printf("Something went wrong\n");
         return TOKEN_DEFAULT;
     }
 }
@@ -162,12 +186,95 @@ void tokenize (tokensArray* tokens, char* input) { //Parsing text into a dynamic
     printf("Succesfully tokenized input string!\n"); //Debugging
 }
 
+/*
+Next thing I need is a function that converts the gotten tokenArray into an abstract syntaxt tree, and to do that
+it needs rules i.e. operations have children and I need to figure out something with ().
+
+Let's brainstorm. 
+x*(x+1) should become:
+    *
+  x   +
+    x   1  
+Which is simple in theory but requires some phases in between. First the function should have a way how to 
+loop and find the order of operations e.g:
+x+1+3*x could become
+        +                       +                       *
+    x      +        or      +      *     but not     +    x
+        1      *          x   1  3   x            +    3
+             3    x                             x   1
+since then the correct order of operations would be lost. => highest order of operation operators should be lower
+than ones of lesser order? Also the last example would just be x*(3+1+x). I think I should keep the highest order
+operations the lowest since they only affect two nodes instead of everything under. 
+Communativity is also something to take into account. 
+
+So how should the algorithm look like? It should create the exact ast as in with x*(x+1) from where other functions
+could simplify the trees in that case it would eventually become x*x+x. Functions are weird with this
+
+x*sin(2*x+3+y) would be 
+            *
+         x     sin
+                +
+             +    y
+          *    3
+        2   x
+           
+functions are very easy to be problematic, easiest idea would be to create an entirely new tree for 
+what is inside it. Also I notice it should be possible to make every tree in the form of a diagonal like so.
+
+x*x+(2/y)*x+4 
+
+        +
+     4     +
+        *     *
+      x   x  x   /
+               2   y
+Taking a common factor we get x*(x+(2/y))+4
+            +
+          4    *
+             x   +
+               x   /
+                 2   y
+Which shows (I suppose) we could always transform the trees into a form like that line with only two elements per level
+
+So how does such a function actually work? Something that just purely makes a version of a tree from the tokens 
+which can be modified and simplified later. 
+It should scan the dynamic array to first find all the the most outside parenthesis () and then treat everything 
+inside one as a placeholder node before it starts to recursively call itself on the resulting sub array. 
+After it correctly finds and makes the outside parenthesis placeholder nodes it can start to look into order of
+operations.
+
+(()) ()
+*/
+
+void createAst(tokensArray *tokens) {
+    int leftParen_count = 0; 
+    int rightParen_count = 0;
+    token* leftParen = NULL;
+    token* rightParen;
+
+    for(int i = 0; i < tokens->size; i++) { //loops thought tokens.
+        if (tokens->data[i].type == TOKEN_LPAREN) { //First encounter will be outmost paren
+            leftParen_count++;
+            if (leftParen == NULL) {
+                leftParen = &tokens->data[i];
+            }
+        }
+        if (tokens->data[i].type == TOKEN_RPAREN) {
+            rightParen_count++;
+            rightParen = &tokens->data[i];
+        }
+        if (leftParen_count == rightParen_count && leftParen_count != 0) {
+            printf("Outmost parenthesis found in: %d and %d\n", );
+        }
+    }
+}
+
 int main (int *argc, char argv[]) {
     tokensArray tokens; //Initializing 
     initTokenArray(&tokens);
 
     //debugging
-    char text[] = "21/(x+42)*(x-1*tan(x))";
+    char text[] = "x*(x+1)";
     tokenize(&tokens, text);
 
     for (int i = 0; i<tokens.size; i++) {
