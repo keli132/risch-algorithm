@@ -96,19 +96,15 @@ node *createNode (token* referenceToken, node* leftNode, node* rightNode, node* 
     }
     printf("Something went wrong with memory allocation!\n");
 }
-node *createSubTree (tokensArray *tokens, int firstTokenPosition, int lastTokenPosition) {
-    node* result = malloc(sizeof(node));
-    
-}
 
-void initTokenArray (tokensArray *tokens) { //Initializing dynamic array.
+void initTokenArray (tokensArray *tokens, int capacity) { //Initializing dynamic array.
     tokens->size = 0;
-    tokens->capacity = 2; 
+    tokens->capacity = capacity; 
     tokens->data = malloc(tokens->capacity * sizeof(token));
 }
 
 void addTokenToArray (tokensArray *tokens, token *newToken) { //Adding new token to array.
-    if (tokens->size == tokens->capacity) { //Adds capacity if full.
+    if (tokens->size >= tokens->capacity) { //Adds capacity if full.
         printf("Allocating more memory for tokens...\n");
         tokens->capacity *= 2;
         tokens->data = realloc(tokens->data, tokens->capacity * sizeof(token)); 
@@ -120,6 +116,55 @@ void addTokenToArray (tokensArray *tokens, token *newToken) { //Adding new token
     newToken->position = tokens->size;
     tokens->data[tokens->size] = *newToken;
     tokens->size++;
+}
+
+void removeTokenFromArray (tokensArray *tokens, int removeTokenPosition) { //Removes a token from a slot.
+    if (tokens->size < removeTokenPosition + 1 || removeTokenPosition < 0) {
+        printf("Cannot remove token from index: %d\n", removeTokenPosition);
+        return;
+    }
+    tokens->size--;
+    for (int i = removeTokenPosition; i < tokens->size; i++) { //Slowly moves everything back by one index.
+        printf("Removing index: %d\n", i);
+        tokens->data->position--;
+        tokens->data[i] = tokens->data[i+1];
+
+    }
+}
+
+void createAst (tokensArray *tokens);
+void debugPrint (tokensArray  *tokens);
+void findMostOutParen(tokensArray *tokens);
+
+node *createSubTree (tokensArray *tokens, int firstTokenPosition, int lastTokenPosition) { //Creates a new tree for recursion.
+    tokensArray subTokens;
+    initTokenArray(&subTokens, 2);
+
+    for (int i = firstTokenPosition + 1; i <= lastTokenPosition - 1; i++) { //Copies everything to subTokens.
+        addTokenToArray(&subTokens, &(tokens->data[i]));
+    }
+    debugPrint(&subTokens);
+
+    
+}
+
+void debugPrint (tokensArray *tokens) {
+    for (int i = 0; i < tokens->size; i++) {
+    printf("%d. token type: %s\n", i+1, tokenTypeToString(tokens->data[i].type));
+    }
+    printf("Input: ");
+    for (int i = 0; i<tokens->size; i++) {
+        if (tokens->data[i].type == TOKEN_NUMBER) {
+            printf("%d", tokens->data[i].value.number);
+            continue;
+        }
+        if (tokens->data[i].type == TOKEN_VARIABLE) {
+            printf("%c", tokens->data[i].value.variable);
+            continue;
+        }
+        printf("%s", tokenTypeToString(tokens->data[i].type));
+    }
+    printf("\nTokens size: %d\n", tokens->size);
 }
 
 token_type readFullFunction(char* input, int* i) {
@@ -184,12 +229,13 @@ void tokenize (tokensArray* tokens, char* input) { //Parsing text into a dynamic
         }
         printf("Succesfully read input: %c\n", c);
         i++;
-        continue;
     }
     printf("Succesfully tokenized input string!\n"); //Debugging
 }
 
 /*
+
+---My ideas---
 Next thing I need is a function that converts the gotten tokenArray into an abstract syntaxt tree, and to do that
 it needs rules i.e. operations have children and I need to figure out something with ().
 
@@ -247,16 +293,15 @@ After it correctly finds and makes the outside parenthesis placeholder nodes it 
 operations.
 
 
-Once we have the addresses for the outermost 
+Once we have the addresses for the outermost parenthesis we should try to create a subtree?
 */
 
-void createAst(tokensArray *tokens) {
+void findMostOutParen (tokensArray *tokens) {
     int leftParen_count = 0; 
     int rightParen_count = 0;
     token* leftParen = NULL;
     token* rightParen;
-
-    for(int i = 0; i < tokens->size; i++) { //loops throught tokens.
+    for(int i = 0; i < tokens->size; i++) { //Loops throught tokens.
         if (tokens->data[i].type == TOKEN_LPAREN) { //First encounter will be outmost parenthesis.
             leftParen_count++;
             if (leftParen == NULL) {
@@ -269,38 +314,34 @@ void createAst(tokensArray *tokens) {
         }
         if (leftParen_count == rightParen_count && leftParen_count != 0) {
             printf("Outmost parenthesis from %d to %d\n", leftParen->position, rightParen->position); //Debug
+            createSubTree(tokens, leftParen->position, rightParen->position);
             leftParen_count = rightParen_count = 0; //Resets the counter.
-            leftParen = NULL;     
+            leftParen = NULL;
+
         }
     }
 
-    
 }
+
+
+void createAst(tokensArray *tokens) {
+    findMostOutParen(tokens);
+
+
+
+}
+
 
 int main (int *argc, char argv[]) {
     tokensArray tokens; //Initializing 
-    initTokenArray(&tokens);
+    initTokenArray(&tokens, 2);
 
     //debugging
-    char text[] = "x*(1+(x+1)*4)+(33)+x*()";
+    char text[] = "x*(1+(x+1)*4)+(33/2)+x*(67*x+2)";
     tokenize(&tokens, text);
 
-    for (int i = 0; i<tokens.size; i++) {
-        printf("%d. token type: %s\n", i+1, tokenTypeToString(tokens.data[i].type));
-    }
-    printf("Original input: ");
-    for (int i = 0; i<tokens.size; i++) {
-        if (tokens.data[i].type == TOKEN_NUMBER) {
-            printf("%d", tokens.data[i].value.number);
-            continue;
-        }
-        if (tokens.data[i].type == TOKEN_VARIABLE) {
-            printf("%c", tokens.data[i].value.variable);
-            continue;
-        }
-        printf("%s", tokenTypeToString(tokens.data[i].type));
-    }
-    printf("\n");
+    debugPrint(&tokens);
+
     createAst(&tokens);
 
     return RETURN_VALUE;

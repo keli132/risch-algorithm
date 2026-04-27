@@ -1,0 +1,89 @@
+[33mcommit 188b7dc45589e5be1878d53e649f05fa1ae5830f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 19:19:44 2026 +0300
+
+    Got a way to find the outermost parenthesis now.
+
+[33mcommit 335a0bf654494b857163c02b7eb14748a702082e[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 18:39:37 2026 +0300
+
+    test
+
+[33mcommit ae9436597c1830257696d4434e73e4d87116d282[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 18:13:01 2026 +0300
+
+    Started working on ast.
+
+[33mcommit 55833aa5abdd244979fd7f3da7019cc6b278afd3[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 15:34:34 2026 +0300
+
+    Now also prints the original input as is.
+
+[33mcommit 0d0879de05ecac614523efbb9bf7ba89c8d2b9ed[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 15:19:58 2026 +0300
+
+    the smallest change ever
+
+[33mcommit d0a2c6830b9fa871bfc116f284bdb92b77ee95bb[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 15:18:13 2026 +0300
+
+    Fixed stuff, mainly debugging messages.
+
+[33mcommit 954af57459bad07a9ca3fa306aea5ff5a7a535d5[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 14:38:22 2026 +0300
+
+    Started working on the tokenizer funktion.
+
+[33mcommit c08c933c645a1d60b194394baf91d6b907cae102[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 13:36:36 2026 +0300
+
+    Debugging message fixes.
+
+[33mcommit 91988d6f9d53c13614c16851e9ebb373be56b0b8[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 13:35:39 2026 +0300
+
+    Fixed a memory leak
+
+[33mcommit b64aa5cf674a454bfba589cb9d3b199a928a880b[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 13:17:52 2026 +0300
+
+    debugging and small changes
+
+[33mcommit 22b5402d9f13b3b7804dc9d190f3810071f04e17[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 12:50:33 2026 +0300
+
+    Made createToken()
+
+[33mcommit d99e9295ea75bc69940908a6a38f6b759d24c321[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 12:18:07 2026 +0300
+
+    uhh
+
+[33mcommit 95b8791b84591d67d9cf6e76080fc2a0454599f4[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 12:14:01 2026 +0300
+
+    Removed executable files
+
+[33mcommit 46434b5dd3ae342159ba42525ac1317d86e75432[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 12:03:11 2026 +0300
+
+    Started rewriting the code. Added dynamic array.
+
+[33mcommit b751c1f1fc391c7af25f1805197f979b3ca63dcf[m
+Author: keli132 <salonenaaro09@gmail.com>
+Date:   Mon Apr 27 09:34:32 2026 +0300
+
+    First commit
