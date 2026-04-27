@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define RETURN_VALUE 0
-#define DEFAULT_VARIABLE 'O'
+#define DEFAULT 67 
 
 //How should I go on about this?
 /* Goals:
@@ -29,7 +29,7 @@ typedef enum { //Pretty self explanatory.
     TOKEN_TAN
 } token_type; 
 
-typedef struct {
+typedef struct token {
     token_type type;
     struct { //Used only for number and variable types.
         int number;
@@ -64,10 +64,13 @@ void initTokenArray (tokensArray *tokens) { //Initializing dynamic array.
 
 void addTokenToArray (tokensArray *tokens, token *newToken) { //Adding new token to array.
     if (tokens->size == tokens->capacity) { //Add capacity if full.
+        printf("Allocating more memory for tokens...\n");
         tokens->capacity *= 2;
         tokens->data = realloc(tokens->data, tokens->capacity * sizeof(token)); 
+        printf("woof\n");
     }
-    tokens->data[tokens->size + 1] = *newToken;
+    printf("meow\n");
+    tokens->data[tokens->size] = *newToken;
     tokens->size++;
 }
 
@@ -76,14 +79,17 @@ token* tokenizer (char* input) { //Parsing text into a dynamic array of tokens.
 }
 
 int main (int *argc, char argv[]) {
-    //debugging
-    tokensArray tokens;
+    tokensArray tokens; //Initializing 
     initTokenArray(&tokens);
-    addTokenToArray(&tokens, createToken(TOKEN_NUMBER, 2, DEFAULT_VARIABLE));
-    
-    printf("%d\n", tokens.data[1].value.number);
-    printf("%d\n", tokens.size);
 
+    //debugging
+    addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
+    addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
+    addTokenToArray(&tokens, createToken(TOKEN_PLUS, DEFAULT, DEFAULT));
+    addTokenToArray(&tokens, createToken(TOKEN_NUMBER, 2, DEFAULT));
+    printf("%d\n", tokens.data[3].value.number);
+    printf("%d\n", tokens.size);
+    
     return RETURN_VALUE;
 }
 
