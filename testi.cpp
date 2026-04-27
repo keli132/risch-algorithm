@@ -145,9 +145,9 @@ Node* aster (Token* Tokens, int* Tokens_count) { //should be obvious by now
     //and child nodes out of that, might need to also handle cases where (2*x+4-y) i.e.
     //multiple operations inside () D:
     Node* parenthesisNode(int* node_count, Token* Tokens, Node* Nodes) {
-        Node parenthesis;
         
         
+        return 
     }
 
     for (int i=0; i <= *Tokens_count; i++) {
@@ -157,6 +157,9 @@ Node* aster (Token* Tokens, int* Tokens_count) { //should be obvious by now
             node_count++; 
             //next i need to check the left token which can only be ) or a number or a variable and make it into a child node
             //no i need to make a check if () or just number/variable and if () then make a big ass node
+            if (Token[i+1].type == TOKEN_LPAREN) {
+                parenthesisNode()
+            }
             
         }   
     }
