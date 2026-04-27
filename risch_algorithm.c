@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define RETURN_VALUE 0
+#define DEFAULT_VARIABLE 'O'
 
 //How should I go on about this?
 /* Goals:
@@ -10,9 +11,10 @@
 2. Way to create the ast.
 3. way to use the ast in a meaningfull way i.e. a way to go from node to node and simplify
    expressions.
+
 */
 
-typedef enum {
+typedef enum { //Pretty self explanatory.
     TOKEN_DEFAULT,
     TOKEN_NUMBER,
     TOKEN_VARIABLE,
@@ -29,7 +31,7 @@ typedef enum {
 
 typedef struct {
     token_type type;
-    union { //Used only for number and variable types.
+    struct { //Used only for number and variable types.
         int number;
         char variable;
     } value;
@@ -41,29 +43,32 @@ typedef struct { //Dynamic array for tokens.
     int capacity;
 } tokensArray;
 
-token *createToken(token_type type, int number, char variable) { //Allocates memory for a new token.
+token* createToken(token_type type, int number, char variable) { //Allocates memory for a new token.
     token* result = malloc(sizeof(token));
     if (result != NULL) {
         result->type = type;
-        result->value.number = number;
-        result->value.variable = variable;
+        switch (type) {
+            case TOKEN_NUMBER: result->value.number = number;
+            case TOKEN_VARIABLE: result->value.variable = variable;
+        }
         return result;
     }
     printf("Something went wrong with memory allocation!\n");
 }
 
-void initTokenArray (tokensArray *tokens) { //initializing dynamic array.
+void initTokenArray (tokensArray *tokens) { //Initializing dynamic array.
     tokens->size = 0;
     tokens->capacity = 2; 
     tokens->data = malloc(tokens->capacity * sizeof(token));
 }
 
-void pushTokenToArray (tokensArray *tokens, token newToken) { //Adding new token to array.
+void addTokenToArray (tokensArray *tokens, token *newToken) { //Adding new token to array.
     if (tokens->size == tokens->capacity) { //Add capacity if full.
         tokens->capacity *= 2;
         tokens->data = realloc(tokens->data, tokens->capacity * sizeof(token)); 
     }
-    tokens->data[tokens->size + 1] = newToken;
+    tokens->data[tokens->size + 1] = *newToken;
+    tokens->size++;
 }
 
 token* tokenizer (char* input) { //Parsing text into a dynamic array of tokens.
@@ -74,7 +79,10 @@ int main (int *argc, char argv[]) {
     //debugging
     tokensArray tokens;
     initTokenArray(&tokens);
-    pushTokenToArray(&tokens, *createToken(TOKEN_NUMBER, 2, NULL));
+    addTokenToArray(&tokens, createToken(TOKEN_NUMBER, 2, DEFAULT_VARIABLE));
+    
+    printf("%d\n", tokens.data[1].value.number);
+    printf("%d\n", tokens.size);
 
     return RETURN_VALUE;
 }
