@@ -3,7 +3,8 @@
 #include <string.h>
 #define RETURN_VALUE 0
 #define DEFAULT 67 
-
+//This program should only be for the AST creation at first. Other actual logic regarding the full algorithm should
+//be put elsewhere.
 //How should I go on about this? This file might mainly be the program to turn input string into ast?
 /* Goals:
 1. Way to parse text into tokens, creates a list which can be given to another function that
@@ -123,7 +124,7 @@ void removeTokenFromArray (tokensArray *tokens, int removeTokenPosition) { //Rem
         printf("Cannot remove token from index: %d\n", removeTokenPosition);
         return;
     }
-    tokens->size--;
+    tokens->size--; //Need to work on this maybe? maybe problem??
     for (int i = removeTokenPosition; i < tokens->size; i++) { //Slowly moves everything back by one index.
         printf("Removing index: %d\n", i);
         tokens->data->position--;
@@ -134,9 +135,9 @@ void removeTokenFromArray (tokensArray *tokens, int removeTokenPosition) { //Rem
 
 node *createAst (tokensArray *tokens);
 void debugPrint (tokensArray  *tokens);
-void findMostOutParen(tokensArray *tokens);
+node *findMostOutParen(tokensArray *tokens);
 
-node *createSubTree (tokensArray *tokens, int firstTokenPosition, int lastTokenPosition) { //Creates a new tree for recursion.
+node *createSubTree (tokensArray *tokens, int firstTokenPosition, int lastTokenPosition) { //Creates a new tree.
     tokensArray subTokens;
     initTokenArray(&subTokens, 2);
 
@@ -297,8 +298,7 @@ operations.
 Once we have the addresses for the outermost parenthesis we should try to create a subtree?
 */
 
-
-void findMostOutParen (tokensArray *tokens) {
+node *findMostOutParen (tokensArray *tokens) {
     int leftParen_count = 0; 
     int rightParen_count = 0;
     token* leftParen = NULL;
@@ -316,7 +316,7 @@ void findMostOutParen (tokensArray *tokens) {
         }
         if (leftParen_count == rightParen_count && leftParen_count != 0) {
             printf("Outmost parenthesis from %d to %d\n", leftParen->position, rightParen->position); //Debug
-            createSubTree(tokens, leftParen->position, rightParen->position);
+            return createSubTree(tokens, leftParen->position, rightParen->position);
             leftParen_count = rightParen_count = 0; //Resets the counter.
             leftParen = NULL;
 
@@ -327,9 +327,8 @@ void findMostOutParen (tokensArray *tokens) {
 
 }
 
-node *createAst(tokensArray *tokens) {
-    
-
+node *createAst (tokensArray *tokens) {
+    findMostOutParen (tokens);
 
 }
 
